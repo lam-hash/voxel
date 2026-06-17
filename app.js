@@ -8,7 +8,7 @@ let sel = null;
 
 // ---------- Helpers ----------
 const $ = (id) => document.getElementById(id);
-const money = (n) => "$" + n.toFixed(2);
+const money = (n) => "HK$" + Math.round(n);
 const material = (id) => MATERIALS.find((m) => m.id === id);
 const color = (id) => COLORS.find((c) => c.id === id);
 const size = (id) => SIZES.find((s) => s.id === id);
