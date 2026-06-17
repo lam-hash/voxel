@@ -8,6 +8,14 @@ const STORE = {
   whatsapp: "",
   // Email address that orders should be sent to.
   email: "orders@voxel.example",
+  // Auto-email orders: paste your free Web3Forms access key here.
+  // Get one at https://web3forms.com (enter your email — the key is sent to you).
+  // When set, every submitted order is emailed to that address automatically.
+  // Leave "" to instead have customers send via the WhatsApp/Email buttons.
+  web3formsKey: "",
+  // Auto-filled by the "Start VOXEL Orders" program on your Mac — don't edit by hand.
+  // When your Orders program is running, each order is also saved to your hard drive.
+  localEndpoint: "",
   // Shown to customers at checkout.
   paymentNote: "💵 Cash on pickup / delivery — no online payment needed.",
 };

@@ -293,7 +293,7 @@ function renderCheckout() {
   $("placeOrder").addEventListener("click", placeOrder);
 }
 
-function placeOrder() {
+async function placeOrder() {
   const form = $("checkoutForm");
   if (!form.reportValidity()) return;
   const fd = new FormData(form);
@@ -321,24 +321,81 @@ function placeOrder() {
   orders.push(order);
   localStorage.setItem("voxel_orders", JSON.stringify(orders));
 
-  // Build a human-readable order message for WhatsApp / email.
   const msg = buildOrderMessage(order);
+  cart = [];
+  saveCart();
+
+  // Also send a copy to the store owner's Mac (VOXEL Orders program), if running.
+  // Fire-and-forget: never blocks checkout, silently ignored if the Mac is off.
+  if (STORE.localEndpoint) {
+    fetch(STORE.localEndpoint.replace(/\/$/, "") + "/order", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(order),
+    }).catch(() => {});
+  }
+
+  // If a Web3Forms key is set, auto-email the order to the store owner so
+  // it arrives even if the customer never taps a send button.
+  if (STORE.web3formsKey) {
+    $("drawerFoot").innerHTML = `<button class="btn" style="width:100%" disabled>Sending order…</button>`;
+    try {
+      const res = await fetch("https://api.web3forms.com/submit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        body: JSON.stringify({
+          access_key: STORE.web3formsKey,
+          subject: `🧊 VOXEL Order ${order.id} — ${money(order.total)}`,
+          from_name: "VOXEL Store",
+          name: order.customer.name,
+          email: order.customer.email,
+          message: msg,
+        }),
+      });
+      const data = await res.json();
+      if (!data.success) throw new Error(data.message || "submit failed");
+      showConfirmed(order);
+      return;
+    } catch (e) {
+      console.error("Auto-submit failed, falling back to manual send:", e);
+      showManualSend(order, msg, "We couldn't send it automatically — please tap a button below to send your order.");
+      return;
+    }
+  }
+
+  // No Web3Forms key configured: customer sends via WhatsApp / email.
+  showManualSend(order, msg, "Send us your order using a button below and we'll confirm it.");
+}
+
+// Order was emailed to the store automatically — nothing more for the customer to do.
+function showConfirmed(order) {
+  $("drawerTitle").textContent = "Order confirmed";
+  $("drawerItems").innerHTML = `
+    <div class="confirm">
+      <div class="check">✅</div>
+      <h2>Thank you, ${order.customer.name.split(" ")[0]}!</h2>
+      <p>Your order has been received. We'll contact you at <b>${order.customer.email}</b> to confirm. Payment is <b>cash on pickup / delivery</b>.</p>
+      <div class="order-id">${order.id}</div>
+    </div>
+  `;
+  $("drawerFoot").innerHTML = `<button class="btn" id="doneOrder" style="width:100%">Done</button>`;
+  $("doneOrder").addEventListener("click", closeDrawer);
+}
+
+// Customer sends the order themselves via WhatsApp / email (fallback / no-key mode).
+function showManualSend(order, msg, lead) {
   const waLink = STORE.whatsapp
     ? `https://wa.me/${STORE.whatsapp}?text=${encodeURIComponent(msg)}`
     : null;
   const mailLink = `mailto:${STORE.email}?subject=${encodeURIComponent(
     "VOXEL Order " + order.id
   )}&body=${encodeURIComponent(msg)}`;
-
-  // Clear cart and show confirmation
-  cart = [];
-  saveCart();
   $("drawerTitle").textContent = "Almost done!";
   $("drawerItems").innerHTML = `
     <div class="confirm">
       <div class="check">🧊</div>
       <h2>One last step, ${order.customer.name.split(" ")[0]}</h2>
-      <p>Send us your order using a button below and we'll confirm it. Payment is <b>cash on pickup / delivery</b>.</p>
+      <p>${lead} Payment is <b>cash on pickup / delivery</b>.</p>
       <div class="order-id">${order.id}</div>
     </div>
   `;
