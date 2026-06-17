@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VOXEL — Custom 3D Prints</title>
+  <meta name="description" content="VOXEL — order custom 3D prints. Choose your design, color, material and size. Printed on a Bambu Lab A1 mini." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header>
+    <div class="wrap nav">
+      <a class="logo" href="#"><span class="cube"></span>VOXEL</a>
+      <div class="nav-right">
+        <span class="printer-pill">🖨️ Printed on a Bambu Lab A1 mini</span>
+        <button class="cart-btn" id="openCart">
+          Cart
+          <span class="cart-count" id="cartCount">0</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="hero">
+      <h1>Custom <span class="grad">3D prints</span>,<br />made your way.</h1>
+      <p>Pick a design, choose your color, material and size — we print it fresh and ship it out. Designed and printed in-house.</p>
+      <div class="specs">
+        <div class="spec"><b>180mm³</b> max print size</div>
+        <div class="spec"><b>4 materials</b> PLA · Silk · PETG · TPU</div>
+        <div class="spec"><b>12 colors</b> to choose from</div>
+      </div>
+    </section>
+
+    <div class="filters" id="filters"></div>
+    <section class="grid" id="grid"></section>
+  </main>
+
+  <footer>
+    VOXEL · Custom 3D printing · Bambu Lab A1 mini · Build volume 180 × 180 × 180 mm
+  </footer>
+
+  <!-- Product customization modal -->
+  <div class="overlay" id="overlay">
+    <div class="modal" id="modal"><!-- filled by JS --></div>
+  </div>
+
+  <!-- Cart drawer -->
+  <aside class="drawer" id="drawer">
+    <div class="drawer-head">
+      <h2 id="drawerTitle">Your Cart</h2>
+      <button class="x-close" id="closeDrawer">&times;</button>
+    </div>
+    <div class="drawer-items" id="drawerItems"></div>
+    <div class="drawer-foot" id="drawerFoot"></div>
+  </aside>
+  <div class="overlay" id="drawerOverlay" style="background:rgba(0,0,0,.5);backdrop-filter:none;"></div>
+
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
