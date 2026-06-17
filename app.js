@@ -14,6 +14,15 @@ const color = (id) => COLORS.find((c) => c.id === id);
 const size = (id) => SIZES.find((s) => s.id === id);
 
 const imgFor = (id) => `assets/${id}.svg`;
+// If a product has no image file yet, show its emoji instead of a broken image.
+function imgFallback(el, icon) {
+  const s = document.createElement("span");
+  s.className = "thumb-emoji";
+  s.textContent = icon;
+  el.replaceWith(s);
+}
+const imgTag = (p) =>
+  `<img src="${imgFor(p.id)}" alt="${p.name}" onerror="imgFallback(this,'${p.icon}')" />`;
 
 function itemPrice(it) {
   const base = PRODUCTS.find((p) => p.id === it.productId).basePrice;
@@ -55,7 +64,7 @@ function renderGrid() {
     <div class="card">
       <div class="thumb">
         ${p.popular ? '<span class="badge">Popular</span>' : ""}
-        <img src="${imgFor(p.id)}" alt="${p.name}" />
+        ${imgTag(p)}
       </div>
       <div class="card-body">
         <span class="cat">${p.category}</span>
@@ -101,7 +110,7 @@ function renderModal() {
 
   $("modal").innerHTML = `
     <div class="modal-head">
-      <div class="micon"><img src="${imgFor(p.id)}" alt="${p.name}" /></div>
+      <div class="micon">${imgTag(p)}</div>
       <div>
         <h2>${p.name}</h2>
         <p>${p.desc}</p>
@@ -222,7 +231,7 @@ function renderDrawer() {
       const c = color(it.color);
       return `
       <div class="line-item">
-        <div class="li-icon"><img src="${imgFor(p.id)}" alt="${p.name}" /></div>
+        <div class="li-icon">${imgTag(p)}</div>
         <div class="li-main">
           <h4>${p.name}</h4>
           <div class="li-opts">
