@@ -91,7 +91,7 @@ function renderGrid() {
       (p) => `
     <div class="card">
       <div class="thumb">
-        ${p.popular ? '<span class="badge">Popular</span>' : ""}
+        ${p.custom ? '<span class="badge">Custom</span>' : p.popular ? '<span class="badge">Popular</span>' : ""}
         ${imgTag(p)}
       </div>
       <div class="card-body">
@@ -147,6 +147,7 @@ function renderModal() {
       <button class="x-close" id="mClose">&times;</button>
     </div>
     <div class="modal-body">
+      ${p.custom ? `<div class="pay-note" style="background:rgba(108,92,231,.12);border-color:rgba(108,92,231,.5);color:#cdc6ff">✨ Custom order — final price <b>HK$600–1200</b>, confirmed with you before we print. The price shown is the starting estimate.</div>` : ""}
       <div class="opt-group">
         <label class="title">Material</label>
         <div class="pills">
@@ -171,7 +172,7 @@ function renderModal() {
         </div>
       </div>
 
-      <div class="opt-group">
+      ${p.custom ? "" : `<div class="opt-group">
         <label class="title">Size</label>
         <div class="pills">
           ${SIZES.map(
@@ -179,7 +180,7 @@ function renderModal() {
               `<button class="pill ${s.id === sel.size ? "active" : ""}" data-size="${s.id}">${s.name}<small>${Math.round(s.scale * 100)}% scale</small></button>`
           ).join("")}
         </div>
-      </div>
+      </div>`}
 
       <div class="opt-group">
         <label class="title">Quantity</label>
@@ -191,13 +192,13 @@ function renderModal() {
       </div>
 
       <div class="opt-group note">
-        <label class="title">Notes (optional)</label>
-        <textarea id="mNote" placeholder="Anything we should know? e.g. text to engrave, gift note…">${sel.note}</textarea>
+        <label class="title">${p.custom ? "Describe your custom print *" : "Notes (optional)"}</label>
+        <textarea id="mNote" placeholder="${p.custom ? "Tell us exactly what you want, and/or paste a link to your 3D file (STL, MakerWorld, Thingiverse, Google Drive…)" : "Anything we should know? e.g. text to engrave, gift note…"}">${sel.note}</textarea>
       </div>
     </div>
     <div class="modal-foot">
-      <div class="total">${money(unit * sel.qty)}<small>${money(unit)} each</small></div>
-      <button class="btn" id="addToCart">Add to cart</button>
+      <div class="total">${p.custom ? "From " + money(unit) : money(unit * sel.qty)}<small>${p.custom ? "starting price" : money(unit) + " each"}</small></div>
+      <button class="btn" id="addToCart">${p.custom ? "Add request to cart" : "Add to cart"}</button>
     </div>
   `;
 
@@ -225,6 +226,11 @@ function renderModal() {
 }
 
 function addCurrentToCart() {
+  const p = PRODUCTS.find((x) => x.id === sel.productId);
+  if (p.custom && !sel.note.trim()) {
+    alert("Please describe your custom print (or paste a link to your 3D file) so we can quote it.");
+    return;
+  }
   cart.push({ ...sel });
   saveCart();
   closeModal();
@@ -272,7 +278,7 @@ function renderDrawer() {
         <div class="li-main">
           <h4>${p.name}</h4>
           <div class="li-opts">
-            <span class="color-dot" style="background:${c.hex}"></span>${c.name} · ${material(it.material).name} · ${size(it.size).name}
+            <span class="color-dot" style="background:${c.hex}"></span>${c.name} · ${material(it.material).name}${p.custom ? " · custom" : " · " + size(it.size).name}
             ${it.note ? `<br/>📝 ${it.note}` : ""}
           </div>
           <div class="li-foot">
@@ -353,6 +359,7 @@ async function placeOrder() {
         size: size(it.size).name,
         qty: it.qty,
         note: it.note,
+        custom: !!p.custom,
         lineTotal: +(itemPrice(it) * it.qty).toFixed(2),
       };
     }),
@@ -468,7 +475,11 @@ function buildOrderMessage(order) {
   lines.push("");
   lines.push("Items:");
   order.items.forEach((it) => {
-    lines.push(`• ${it.qty}× ${it.name} — ${it.color}, ${it.material}, ${it.size} (${money(it.lineTotal)})`);
+    if (it.custom) {
+      lines.push(`• ${it.qty}× ${it.name} — ${it.color}, ${it.material} (from ${money(it.lineTotal)} — PRICE TO CONFIRM)`);
+    } else {
+      lines.push(`• ${it.qty}× ${it.name} — ${it.color}, ${it.material}, ${it.size} (${money(it.lineTotal)})`);
+    }
     if (it.note) lines.push(`   note: ${it.note}`);
   });
   lines.push("");
