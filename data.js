@@ -7,7 +7,7 @@ const STORE = {
   // Example for US: "14155550123". Leave "" to hide the WhatsApp button.
   whatsapp: "",
   // Email address that orders should be sent to.
-  email: "orders@voxel.example",
+  email: "canigetyournumber1515@gmail.com",
   // Auto-email orders: paste your free Web3Forms access key here.
   // Get one at https://web3forms.com (enter your email — the key is sent to you).
   // When set, every submitted order is emailed to that address automatically.
@@ -28,28 +28,19 @@ const PRINTER = {
   multicolor: "AMS lite (up to 4 colors)",
 };
 
-// Materials the A1 mini handles well (open-frame, no enclosure).
+// Filaments currently in stock. Each material lists the colors available IN
+// that material — picking a material decides which colors a customer can choose.
 const MATERIALS = [
-  { id: "pla", name: "PLA", blurb: "Best all-rounder. Crisp detail, many colors.", priceMult: 1.0 },
-  { id: "pla-silk", name: "Silk PLA", blurb: "Glossy, premium sheen.", priceMult: 1.25 },
-  { id: "petg", name: "PETG", blurb: "Tougher & heat-resistant. Good for outdoors.", priceMult: 1.2 },
-  { id: "tpu", name: "TPU (Flexible)", blurb: "Rubbery & bendable. Phone cases, grips.", priceMult: 1.4 },
+  { id: "pla", name: "PLA", blurb: "Crisp detail, great all-rounder.", priceMult: 1.0, colors: ["white"] },
+  { id: "petg", name: "PETG", blurb: "Tougher & heat-resistant. Good for outdoors.", priceMult: 1.2, colors: ["blue", "red", "gray"] },
 ];
 
-// Common Bambu filament colors (hex is approximate for display).
+// Color definitions (hex is approximate for on-screen display).
 const COLORS = [
-  { id: "black", name: "Black", hex: "#1a1a1a" },
   { id: "white", name: "White", hex: "#f5f5f5" },
-  { id: "gray", name: "Gray", hex: "#8a8f98" },
-  { id: "red", name: "Red", hex: "#e23636" },
-  { id: "orange", name: "Orange", hex: "#f08c2e" },
-  { id: "yellow", name: "Yellow", hex: "#f3c623" },
-  { id: "green", name: "Green", hex: "#3aa856" },
   { id: "blue", name: "Blue", hex: "#2e6df0" },
-  { id: "cyan", name: "Cyan", hex: "#33c4d8" },
-  { id: "purple", name: "Purple", hex: "#8a4fd1" },
-  { id: "pink", name: "Pink", hex: "#f06fb0" },
-  { id: "gold-silk", name: "Silk Gold", hex: "#d4af37" },
+  { id: "red", name: "Red", hex: "#e23636" },
+  { id: "gray", name: "Gray", hex: "#8a8f98" },
 ];
 
 // Size options scale the base price (bigger = more filament + time).
@@ -69,7 +60,7 @@ const PRODUCTS = [
     icon: "🪴",
     basePrice: 150,
     desc: "Faceted low-poly planter with a drainage base. Perfect for succulents.",
-    materials: ["pla", "pla-silk", "petg"],
+    materials: ["pla", "petg"],
     popular: true,
   },
   {
@@ -89,7 +80,7 @@ const PRODUCTS = [
     icon: "🔌",
     basePrice: 120,
     desc: "Stick-on desk cable organizers. Keeps your setup tidy.",
-    materials: ["pla", "petg", "tpu"],
+    materials: ["pla", "petg"],
   },
   {
     id: "dragon",
@@ -98,7 +89,7 @@ const PRODUCTS = [
     icon: "🐉",
     basePrice: 200,
     desc: "Print-in-place flexible dragon. Every segment moves — no assembly.",
-    materials: ["pla", "pla-silk"],
+    materials: ["pla"],
     popular: true,
   },
   {
@@ -117,7 +108,7 @@ const PRODUCTS = [
     icon: "🎲",
     basePrice: 180,
     desc: "Tabletop dice tower with a built-in tray. Fits the A1 mini bed perfectly.",
-    materials: ["pla", "pla-silk", "petg"],
+    materials: ["pla", "petg"],
   },
   {
     id: "keycap",
@@ -125,17 +116,8 @@ const PRODUCTS = [
     category: "Desk",
     icon: "⌨️",
     basePrice: 100,
-    desc: "MX-compatible artisan keycap. Great in Silk PLA.",
-    materials: ["pla", "pla-silk"],
-  },
-  {
-    id: "phone-case",
-    name: "Flexible Phone Case",
-    category: "Accessories",
-    icon: "🛡️",
-    basePrice: 160,
-    desc: "Shock-absorbing TPU case. Tell us your phone model at checkout.",
-    materials: ["tpu"],
+    desc: "MX-compatible artisan keycap. Crisp detail in PLA.",
+    materials: ["pla"],
   },
   {
     id: "vase",
@@ -143,8 +125,8 @@ const PRODUCTS = [
     category: "Home",
     icon: "🏺",
     basePrice: 150,
-    desc: "Single-wall spiral vase with a smooth ribbed finish. Stunning in Silk.",
-    materials: ["pla", "pla-silk", "petg"],
+    desc: "Single-wall spiral vase with a smooth ribbed finish.",
+    materials: ["pla", "petg"],
   },
 
   // ----- More products -----
@@ -155,7 +137,7 @@ const PRODUCTS = [
     icon: "✏️",
     basePrice: 110,
     desc: "Honeycomb-pattern desk cup for pens, pencils and scissors.",
-    materials: ["pla", "pla-silk", "petg"],
+    materials: ["pla", "petg"],
   },
   {
     id: "desk-tray",
@@ -173,7 +155,7 @@ const PRODUCTS = [
     icon: "💼",
     basePrice: 100,
     desc: "Angled desk holder that displays your cards neatly.",
-    materials: ["pla", "pla-silk"],
+    materials: ["pla"],
   },
   {
     id: "tablet-stand",
@@ -192,7 +174,7 @@ const PRODUCTS = [
     icon: "🎵",
     basePrice: 100,
     desc: "Snap holder / keychain for AirPods-style cases.",
-    materials: ["pla", "tpu"],
+    materials: ["pla"],
   },
   {
     id: "keychain",
@@ -201,7 +183,7 @@ const PRODUCTS = [
     icon: "🔑",
     basePrice: 100,
     desc: "Personalized keychain — tell us the name or text at checkout.",
-    materials: ["pla", "pla-silk"],
+    materials: ["pla"],
     popular: true,
   },
   {
@@ -247,7 +229,7 @@ const PRODUCTS = [
     icon: "☕",
     basePrice: 140,
     desc: "Four geometric coasters with a matching holder.",
-    materials: ["pla", "pla-silk", "petg"],
+    materials: ["pla", "petg"],
   },
   {
     id: "key-rack",
@@ -264,8 +246,8 @@ const PRODUCTS = [
     category: "Home",
     icon: "🚪",
     basePrice: 100,
-    desc: "Wedge door stop — extra grippy in flexible TPU.",
-    materials: ["tpu", "petg"],
+    desc: "Wedge door stop in tough, grippy PETG.",
+    materials: ["petg"],
   },
   {
     id: "plant-globe",
@@ -283,7 +265,7 @@ const PRODUCTS = [
     icon: "🌀",
     basePrice: 110,
     desc: "Smooth-spinning fidget toy. Printed in one piece.",
-    materials: ["pla", "pla-silk"],
+    materials: ["pla"],
     popular: true,
   },
   {
@@ -293,7 +275,7 @@ const PRODUCTS = [
     icon: "🐙",
     basePrice: 170,
     desc: "Articulated print-in-place octopus — every leg wiggles.",
-    materials: ["pla", "pla-silk"],
+    materials: ["pla"],
     popular: true,
   },
   {
@@ -303,7 +285,7 @@ const PRODUCTS = [
     icon: "🦎",
     basePrice: 170,
     desc: "Adorable articulated axolotl that bends and poses.",
-    materials: ["pla", "pla-silk"],
+    materials: ["pla"],
   },
   {
     id: "maze-cube",
@@ -330,7 +312,7 @@ const PRODUCTS = [
     icon: "🪧",
     basePrice: 150,
     desc: "Personalized desk name sign — give us the text at checkout.",
-    materials: ["pla", "pla-silk"],
+    materials: ["pla"],
     popular: true,
   },
 ];

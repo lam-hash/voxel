@@ -12,6 +12,8 @@ const money = (n) => "HK$" + Math.round(n);
 const material = (id) => MATERIALS.find((m) => m.id === id);
 const color = (id) => COLORS.find((c) => c.id === id);
 const size = (id) => SIZES.find((s) => s.id === id);
+// Colors available in a given material (color choice depends on stock).
+const matColors = (matId) => (material(matId).colors || []).map(color);
 
 const imgFor = (id) => `assets/${id}.svg`;
 // If a product has no image file yet, show its emoji instead of a broken image.
@@ -86,10 +88,11 @@ function renderGrid() {
 // ---------- Product modal ----------
 function openModal(productId) {
   const p = PRODUCTS.find((x) => x.id === productId);
+  const firstMat = p.materials[0];
   sel = {
     productId,
-    material: p.materials[0],
-    color: COLORS[0].id,
+    material: firstMat,
+    color: matColors(firstMat)[0].id,
     size: "m",
     qty: 1,
     note: "",
@@ -119,22 +122,24 @@ function renderModal() {
     </div>
     <div class="modal-body">
       <div class="opt-group">
-        <label class="title">Color</label>
-        <div class="swatches">
-          ${COLORS.map(
-            (c) =>
-              `<div class="swatch ${c.id === sel.color ? "active" : ""}" data-color="${c.id}" title="${c.name}" style="background:${c.hex}"><span class="tick">✓</span></div>`
-          ).join("")}
-        </div>
-      </div>
-
-      <div class="opt-group">
         <label class="title">Material</label>
         <div class="pills">
           ${availMats
             .map(
               (m) =>
                 `<button class="pill ${m.id === sel.material ? "active" : ""}" data-mat="${m.id}">${m.name}<small>${m.blurb}</small></button>`
+            )
+            .join("")}
+        </div>
+      </div>
+
+      <div class="opt-group">
+        <label class="title">Color <span style="text-transform:none;font-weight:400;color:var(--muted)">— available in ${material(sel.material).name}</span></label>
+        <div class="swatches">
+          ${matColors(sel.material)
+            .map(
+              (c) =>
+                `<div class="swatch ${c.id === sel.color ? "active" : ""}" data-color="${c.id}" title="${c.name}" style="background:${c.hex}"><span class="tick">✓</span></div>`
             )
             .join("")}
         </div>
@@ -161,7 +166,7 @@ function renderModal() {
 
       <div class="opt-group note">
         <label class="title">Notes (optional)</label>
-        <textarea id="mNote" placeholder="Anything we should know? e.g. phone model, text to engrave…">${sel.note}</textarea>
+        <textarea id="mNote" placeholder="Anything we should know? e.g. text to engrave, gift note…">${sel.note}</textarea>
       </div>
     </div>
     <div class="modal-foot">
@@ -176,7 +181,13 @@ function renderModal() {
     el.addEventListener("click", () => { sel.color = el.dataset.color; renderModal(); })
   );
   $("modal").querySelectorAll("[data-mat]").forEach((el) =>
-    el.addEventListener("click", () => { sel.material = el.dataset.mat; renderModal(); })
+    el.addEventListener("click", () => {
+      sel.material = el.dataset.mat;
+      // If the current color isn't available in the new material, switch to one that is.
+      const avail = matColors(sel.material);
+      if (!avail.some((c) => c.id === sel.color)) sel.color = avail[0].id;
+      renderModal();
+    })
   );
   $("modal").querySelectorAll("[data-size]").forEach((el) =>
     el.addEventListener("click", () => { sel.size = el.dataset.size; renderModal(); })
