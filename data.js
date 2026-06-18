@@ -12,7 +12,7 @@ const STORE = {
   // Get one at https://web3forms.com (enter your email — the key is sent to you).
   // When set, every submitted order is emailed to that address automatically.
   // Leave "" to instead have customers send via the WhatsApp/Email buttons.
-  web3formsKey: "",
+  web3formsKey: "ad48b3f2-31b7-4bb3-9ffe-819a6550c965",
   // Auto-filled by the "Start VOXEL Orders" program on your Mac — don't edit by hand.
   // When your Orders program is running, each order is also saved to your hard drive.
   localEndpoint: "",
