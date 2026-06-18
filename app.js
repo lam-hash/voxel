@@ -392,8 +392,8 @@ async function placeOrder() {
         headers: { "Content-Type": "application/json", Accept: "application/json" },
         body: JSON.stringify({
           access_key: STORE.web3formsKey,
-          subject: `🧊 VOXEL Order ${order.id} — ${money(order.total)}`,
-          from_name: "VOXEL Store",
+          subject: `🧊 VOXEL3D Order ${order.id} — ${money(order.total)}`,
+          from_name: "VOXEL3D Store",
           name: order.customer.name,
           email: order.customer.email,
           message: msg,
@@ -435,7 +435,7 @@ function showManualSend(order, msg, lead) {
     ? `https://wa.me/${STORE.whatsapp}?text=${encodeURIComponent(msg)}`
     : null;
   const mailLink = `mailto:${STORE.email}?subject=${encodeURIComponent(
-    "VOXEL Order " + order.id
+    "VOXEL3D Order " + order.id
   )}&body=${encodeURIComponent(msg)}`;
   $("drawerTitle").textContent = "Almost done!";
   $("drawerItems").innerHTML = `
@@ -458,7 +458,7 @@ function showManualSend(order, msg, lead) {
 
 function buildOrderMessage(order) {
   const lines = [];
-  lines.push(`VOXEL order ${order.id}`);
+  lines.push(`VOXEL3D order ${order.id}`);
   lines.push("");
   lines.push(`Name: ${order.customer.name}`);
   lines.push(`Email: ${order.customer.email}`);
