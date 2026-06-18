@@ -50,6 +50,18 @@ const SIZES = [
   { id: "l", name: "Large", scale: 1.4, priceMult: 1.6 },
 ];
 
+// Fees added at checkout.
+//   type "percent" → rate is a fraction of the subtotal (0.05 = 5%)
+//   type "flat"    → rate is a fixed HK$ amount added to every order
+// To remove a fee, delete its line. To change a rate, edit `rate`.
+const FEES = [
+  { id: "service", label: "Service charge", type: "percent", rate: 0.05 },
+  { id: "tax", label: "Tax", type: "percent", rate: 0.05 },
+];
+
+// How orders are fulfilled (shown in the totals). Free in-store pickup.
+const FULFILMENT = { label: "Store pickup", note: "Free" };
+
 // Sample catalog. `icon` is an emoji used as the thumbnail for now —
 // swap in real photos later by adding an `image` field.
 const PRODUCTS = [

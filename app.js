@@ -28,14 +28,40 @@ const imgTag = (p) =>
 
 function itemPrice(it) {
   const base = PRODUCTS.find((p) => p.id === it.productId).basePrice;
-  return base * material(it.material).priceMult * size(it.size).priceMult;
+  // Round to whole HK$ so all totals add up cleanly for cash.
+  return Math.round(base * material(it.material).priceMult * size(it.size).priceMult);
 }
 function saveCart() {
   localStorage.setItem("voxel_cart", JSON.stringify(cart));
   renderCartCount();
 }
+// Subtotal = items only.
 function cartTotal() {
   return cart.reduce((sum, it) => sum + itemPrice(it) * it.qty, 0);
+}
+// Fee lines computed from the subtotal (each rounded to whole HK$).
+function computeFees(subtotal) {
+  return FEES.map((f) => ({
+    label: f.label,
+    detail: f.type === "percent" ? Math.round(f.rate * 100) + "%" : null,
+    amount: f.type === "percent" ? Math.round(subtotal * f.rate) : f.rate,
+  }));
+}
+// Grand total = subtotal + all fees.
+function grandTotal() {
+  const sub = cartTotal();
+  return sub + computeFees(sub).reduce((s, f) => s + f.amount, 0);
+}
+// Shared totals breakdown shown in the cart and at checkout.
+function summaryRows() {
+  const sub = cartTotal();
+  let html = `<div class="row"><span class="muted">Subtotal</span><span>${money(sub)}</span></div>`;
+  computeFees(sub).forEach((f) => {
+    html += `<div class="row"><span class="muted">${f.label}${f.detail ? " (" + f.detail + ")" : ""}</span><span>${money(f.amount)}</span></div>`;
+  });
+  html += `<div class="row"><span class="muted">${FULFILMENT.label}</span><span>${FULFILMENT.note}</span></div>`;
+  html += `<div class="row total"><span>Total</span><span>${money(grandTotal())}</span></div>`;
+  return html;
 }
 
 // ---------- Catalog ----------
@@ -267,9 +293,7 @@ function renderDrawer() {
   );
 
   $("drawerFoot").innerHTML = `
-    <div class="row"><span class="muted">Subtotal</span><span>${money(cartTotal())}</span></div>
-    <div class="row"><span class="muted">Shipping</span><span>Calculated at checkout</span></div>
-    <div class="row total"><span>Total</span><span>${money(cartTotal())}</span></div>
+    ${summaryRows()}
     <button class="btn" id="goCheckout" style="width:100%">Checkout</button>
   `;
   $("goCheckout").addEventListener("click", () => { checkoutMode = true; renderDrawer(); });
@@ -293,8 +317,8 @@ function renderCheckout() {
         <input name="phone" placeholder="+1 …" />
       </div>
       <div class="field">
-        <label>Shipping address</label>
-        <textarea name="address" required placeholder="Street, city, postal code, country"></textarea>
+        <label>Address (optional — pickup in store)</label>
+        <textarea name="address" placeholder="Only needed if you arrange delivery"></textarea>
       </div>
       <div class="field">
         <label>Order notes (optional)</label>
@@ -303,7 +327,7 @@ function renderCheckout() {
     </form>
   `;
   $("drawerFoot").innerHTML = `
-    <div class="row total"><span>Total</span><span>${money(cartTotal())}</span></div>
+    ${summaryRows()}
     <div style="display:flex;gap:10px">
       <button class="btn ghost" id="backToCart" style="flex:1">Back</button>
       <button class="btn" id="placeOrder" style="flex:2">Place order</button>
@@ -332,7 +356,10 @@ async function placeOrder() {
         lineTotal: +(itemPrice(it) * it.qty).toFixed(2),
       };
     }),
-    total: +cartTotal().toFixed(2),
+    subtotal: cartTotal(),
+    fees: computeFees(cartTotal()),
+    fulfilment: FULFILMENT.label + " (" + FULFILMENT.note + ")",
+    total: grandTotal(),
     placedAt: new Date().toISOString(),
   };
 
@@ -445,7 +472,12 @@ function buildOrderMessage(order) {
     if (it.note) lines.push(`   note: ${it.note}`);
   });
   lines.push("");
-  lines.push(`Total: ${money(order.total)} (cash on pickup/delivery)`);
+  lines.push(`Subtotal: ${money(order.subtotal)}`);
+  (order.fees || []).forEach((f) =>
+    lines.push(`${f.label}${f.detail ? " (" + f.detail + ")" : ""}: ${money(f.amount)}`)
+  );
+  if (order.fulfilment) lines.push(`${order.fulfilment}`);
+  lines.push(`TOTAL: ${money(order.total)} (cash on pickup)`);
   return lines.join("\n");
 }
 
