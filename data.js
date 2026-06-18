@@ -317,14 +317,4 @@ const PRODUCTS = [
     desc: "Sturdy PETG opener with a slot for a fridge magnet.",
     materials: ["petg"],
   },
-  {
-    id: "name-plate",
-    name: "Desk Name Plate",
-    category: "Gifts",
-    icon: "🪧",
-    basePrice: 380,
-    desc: "Personalized desk name sign — give us the text at checkout.",
-    materials: ["pla"],
-    popular: true,
-  },
 ];
